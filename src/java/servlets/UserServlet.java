@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import models.Role;
 import models.User;
 import services.UserService;
 
@@ -25,7 +26,7 @@ public class UserServlet extends HttpServlet {
         UserService udb = new UserService();
 
         try {
-            List<User> usersList = udb.getAll();
+            List<User> usersList = (List<User>) udb.getAll();
             request.setAttribute("users", usersList);
         } catch (Exception ex) {
             Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
@@ -40,7 +41,7 @@ public class UserServlet extends HttpServlet {
 
                 try {
                     udb.delete(emailIn);// if action = deleted users is removed from db by email
-                    List<User> usersList = udb.getAll(); //reloads table from db
+                    List<User> usersList = (List<User>) udb.getAll(); //reloads table from db
                     request.setAttribute("users", usersList);
 
                 } catch (Exception ex) {
@@ -54,7 +55,7 @@ public class UserServlet extends HttpServlet {
 
                         udb.delete(emailMake); //removes user from db
                         try {
-                            List<User> usersList = udb.getAll(); //reloads updated table from db
+                            List<User> usersList = (List<User>) udb.getAll(); //reloads updated table from db
                             request.setAttribute("users", usersList);
                         } catch (Exception ex) {
                             Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
@@ -93,7 +94,7 @@ public class UserServlet extends HttpServlet {
                         request.setAttribute("activeEdit", user.getActive());
                         request.setAttribute("passwordEdit", user.getPassword());
                         try {
-                            List<User> usersList = udb.getAll(); //reloads updated table from db
+                            List<User> usersList = (List<User>) udb.getAll(); //reloads updated table from db
                             request.setAttribute("users", usersList);
                         } catch (Exception ex) {
                             Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,7 +115,7 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        UserDB udb = new UserDB();
+        UserService udb = new UserService();
 
         if (request.getParameter("save") != null) {
 
@@ -150,9 +151,10 @@ public class UserServlet extends HttpServlet {
                             newRole = 3;
                             break;
                     }
-                    user = new User(email, activeEdit, firstName, lastName, password, newRole);
+                    Role roles = new Role(newRole);
+                    user = new User(email, activeEdit, firstName, lastName, password, roles);
 
-                    udb.update(user); //updates user in db
+                    udb.update(email, activeEdit, firstName, lastName, password, roles); //updates user in db
                     List<User> usersList = udb.getAll(); //reloads updated table from db
                     request.setAttribute("users", usersList);
                     request.setAttribute("errorMsgSave", "User Edited!");
@@ -204,10 +206,11 @@ public class UserServlet extends HttpServlet {
                             newRole = 3;
                             break;
                     }
-                    User user = new User(email, activation, fName, lName, password, newRole);
+                    Role roles = new Role(newRole);
+//                    User user = new User(email, activation, fName, lName, password, roles);
                     
                     try {
-                        udb.insert(user); //inserts user into db table
+                        udb.insert(email, activation, fName, lName, password, roles); //inserts user into db table
                         List<User> usersList = udb.getAll(); //reloads updated table from db
                         request.setAttribute("users", usersList);
                         request.setAttribute("errorMsg", "User Added!");
@@ -216,7 +219,7 @@ public class UserServlet extends HttpServlet {
                         try {
                             List<User> usersList = udb.getAll(); //if there is an error that doesnt allow an insert table is reloaded
                             request.setAttribute("users", usersList);
-                            request.setAttribute("errorMsg", "User Added!");
+                            request.setAttribute("errorMsg", "User Not Added!");
                         } catch (Exception ex1) {
                             Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex1);
                         }

@@ -1,26 +1,73 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package models;
+
+import java.io.Serializable;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Dynamic Duo
+ * @author 771684
  */
-public class User {
+@Entity
+@Table(name = "user")
+@XmlRootElement
+@NamedQueries({
+    @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
+    , @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email")
+    , @NamedQuery(name = "User.findByActive", query = "SELECT u FROM User u WHERE u.active = :active")
+    , @NamedQuery(name = "User.findByFirstName", query = "SELECT u FROM User u WHERE u.firstName = :firstName")
+    , @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName")
+    , @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password")})
+public class User implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "email")
     private String email;
-    private Boolean active;
-    private String firstname;
-    private String lastname;
+    @Basic(optional = false)
+    @Column(name = "active")
+    private boolean active;
+    @Basic(optional = false)
+    @Column(name = "first_name")
+    private String firstName;
+    @Basic(optional = false)
+    @Column(name = "last_name")
+    private String lastName;
+    @Basic(optional = false)
+    @Column(name = "password")
     private String password;
-    private int role;
+    @JoinColumn(name = "role", referencedColumnName = "role_id")
+    @ManyToOne(optional = false)
+    private Role role;
 
     public User() {
     }
 
-    public User(String email, Boolean active, String firstname, String lastname, String password, int role) {
+    public User(String email) {
+        this.email = email;
+    }
+
+    public User(String email, boolean active, String firstName, String lastName, String password, Role role) {
         this.email = email;
         this.active = active;
-        this.firstname = firstname;
-        this.lastname = lastname;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.password = password;
         this.role = role;
     }
@@ -33,28 +80,28 @@ public class User {
         this.email = email;
     }
 
-    public Boolean getActive() {
+    public boolean getActive() {
         return active;
     }
 
-    public void setActive(Boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 
     public String getFirstname() {
-        return firstname;
+        return firstName;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setFirstname(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getLastname() {
-        return lastname;
+        return lastName;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setLastname(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPassword() {
@@ -65,12 +112,37 @@ public class User {
         this.password = password;
     }
 
-    public int getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(Role role) {
         this.role = role;
     }
+    
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (email != null ? email.hashCode() : 0);
+        return hash;
+    }
 
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof User)) {
+            return false;
+        }
+        User other = (User) object;
+        if ((this.email == null && other.email != null) || (this.email != null && !this.email.equals(other.email))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "models.User[ email=" + email + " ]";
+    }
+    
 }

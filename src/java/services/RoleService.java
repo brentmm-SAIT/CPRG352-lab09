@@ -1,6 +1,5 @@
 package services;
 
-import dataaccess.ConnectionPool;
 import dataaccess.DBUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
